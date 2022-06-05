@@ -1,16 +1,18 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+/* Fonts -> */
+/*--------------------*/
+@font-face {
+  font-family: 'Inter-Regular';
+  src: url('/fonts/Inter-Regular.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+@font-face {
+  font-family: 'Inter-SemiBold';
+  src: url('/fonts/Inter-SemiBold.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
-
-* {
-  box-sizing: border-box;
-}
+/*--------------------*/
