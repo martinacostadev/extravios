@@ -2258,6 +2258,11 @@
     "array-includes" "^3.1.4"
     "object.assign" "^4.1.2"
 
+"just-debounce-it@^3.0.1":
+  "integrity" "sha512-6EQWOpRV8fm/ame6XvGBSxvsjoMbqj7JS9TV/4Q9aOXt9DQw22GBfTGP6gTAqcBNN/PbzlwtwH7jtM0k9oe9pg=="
+  "resolved" "https://registry.npmjs.org/just-debounce-it/-/just-debounce-it-3.0.1.tgz"
+  "version" "3.0.1"
+
 "language-subtag-registry@~0.3.2":
   "integrity" "sha512-L0IqwlIXjilBVVYKFT37X9Ih11Um5NEl9cbJIuU/SwP/zEEAbBPOnEeeuxVMf45ydWQRDQN3Nqc96OgbH1K+Pg=="
   "resolved" "https://registry.npmjs.org/language-subtag-registry/-/language-subtag-registry-0.3.21.tgz"
