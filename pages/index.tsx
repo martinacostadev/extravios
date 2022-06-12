@@ -19,6 +19,7 @@ import {
   ModalBody,
   useDisclosure,
   ModalFooter,
+  IconButton,
 } from '@chakra-ui/react'
 import { Posts } from 'interfaces'
 
@@ -191,11 +192,12 @@ export default function Home({ postsData, errorCode }: Props) {
               padding={8}
             >
               <Box>
-                <Flex minWidth="max-content" alignItems="center">
+                <Flex alignItems="center">
                   <Heading
                     fontWeight={600}
                     fontSize={{ base: 'l', sm: 'xl', md: '2xl' }}
                     lineHeight={'150%'}
+                    noOfLines={1}
                   >
                     <Link
                       href={{
@@ -210,20 +212,32 @@ export default function Home({ postsData, errorCode }: Props) {
                       {post.title}
                     </Link>
                   </Heading>
-                  <Spacer />
+                  {/* <Spacer />
                   <Button onClick={() => handleShare(post)}>
                     <FiShare2 size={24} />
-                  </Button>
+                  </Button> */}
                 </Flex>
                 <Text color={'cyan.100'} marginTop={2}>
                   {post.description}
                 </Text>
               </Box>
 
-              <Flex minWidth="max-content" alignItems="center" marginTop={4}>
-                <Button onClick={() => handleWhatsApp(post.title)}>
-                  <BsWhatsapp size={24} />
-                </Button>
+              <Flex alignItems="center" marginTop={8}>
+                <IconButton
+                  icon={<BsWhatsapp size={24} />}
+                  aria-label="Escribir mensaje vía WhatsApp"
+                  onClick={() => handleWhatsApp(post.title)}
+                  variant="ghost"
+                  size={'sm'}
+                  mr={4}
+                />
+                <IconButton
+                  icon={<FiShare2 size={24} />}
+                  aria-label="Compartir en redes sociales"
+                  onClick={() => handleShare(post)}
+                  variant="ghost"
+                  size={'sm'}
+                />
                 <Spacer />
                 {PUBLISHED_TIME_AGO}
               </Flex>
