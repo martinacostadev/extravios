@@ -111,7 +111,7 @@ export default function Home({ postsData, errorCode }: Props) {
   }, 500)
 
   const handleGoTop = () => {
-    topRef.current.scrollIntoView({ behavior: 'smooth' })
+    topRef?.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
   const loadMore = async () => {
