@@ -74,6 +74,9 @@ const HomeSearch = forwardRef<HTMLInputElement, { onChange: VoidFunction }>(
 export default function Home({ postsData, errorCode }: Props) {
   const [posts, setPosts] = React.useState(postsData)
   const [page, setPage] = React.useState(2)
+  const topRef = React.useRef<HTMLInputElement>(null)
+  const searchInput = React.useRef<HTMLInputElement>(null)
+
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [modalInfo, setModalInfo] = React.useState({
     title: '',
@@ -92,7 +95,6 @@ export default function Home({ postsData, errorCode }: Props) {
   )
 
   const [overlay, setOverlay] = React.useState(<OverlayTwo />)
-  const searchInput = React.useRef<HTMLInputElement>(null)
 
   if (errorCode) {
     return <Error statusCode={errorCode} />
@@ -107,6 +109,10 @@ export default function Home({ postsData, errorCode }: Props) {
         setPosts(data)
       })
   }, 500)
+
+  const handleGoTop = () => {
+    topRef.current.scrollIntoView({ behavior: 'smooth' })
+  }
 
   const loadMore = async () => {
     setPage(page + 1)
@@ -178,7 +184,14 @@ export default function Home({ postsData, errorCode }: Props) {
         </ModalContent>
       </Modal>
 
-      <Box padding="4" bg="cyan-900" color="white" maxW="md" borderRadius={8}>
+      <Box
+        padding="4"
+        bg="cyan-900"
+        color="white"
+        maxW="md"
+        borderRadius={8}
+        ref={topRef}
+      >
         <Flex minWidth="max-content" alignItems="center" marginTop={4}>
           <Heading
             fontWeight={600}
@@ -186,7 +199,13 @@ export default function Home({ postsData, errorCode }: Props) {
             lineHeight={'150%'}
             marginBottom={4}
           >
-            Extravíos
+            <Link
+              href={{
+                pathname: `/`,
+              }}
+            >
+              Extravíos
+            </Link>
           </Heading>
         </Flex>
         <HomeSearch ref={searchInput} onChange={handleSearch} />
@@ -223,27 +242,12 @@ export default function Home({ postsData, errorCode }: Props) {
                   <Flex alignItems="center">
                     <Heading
                       fontWeight={600}
-                      fontSize={{ base: 'l', sm: 'xl', md: '2xl' }}
+                      fontSize={{ base: 'xl', sm: 'xl', md: '2xl' }}
                       lineHeight={'150%'}
                       noOfLines={1}
                     >
-                      {/* <Link
-                      href={{
-                        pathname: `/post/${post?.id}`,
-                        query: {
-                          title: post?.title,
-                          description: post?.description,
-                          whatsApp: post?.whatsApp,
-                        },
-                      }}
-                    > */}
                       {post.title}
-                      {/* </Link> */}
                     </Heading>
-                    {/* <Spacer />
-                  <Button onClick={() => handleShare(post)}>
-                    <FiShare2 size={24} />
-                  </Button> */}
                   </Flex>
                   <Text color={'cyan.100'} marginTop={2}>
                     {post.description}
@@ -273,8 +277,22 @@ export default function Home({ postsData, errorCode }: Props) {
             </Link>
           )
         })}
-        <Center>
-          <Button onClick={loadMore}>Cargar más</Button>
+        <Center display="flex" flexDirection={'column'} gap={8}>
+          <Button
+            onClick={loadMore}
+            fontWeight="light"
+            backgroundColor={'cyan.800'}
+          >
+            Cargar más...
+          </Button>
+          <Button
+            onClick={handleGoTop}
+            fontSize={12}
+            fontWeight="light"
+            variant="ghost"
+          >
+            Volver al inicio
+          </Button>
         </Center>
       </Box>
     </Container>
