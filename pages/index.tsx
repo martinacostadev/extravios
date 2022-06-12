@@ -115,14 +115,22 @@ export default function Home({ postsData, errorCode }: Props) {
     setPosts((prev) => [...prev, ...postsData])
   }
 
-  const handleWhatsApp = (title: string) => {
+  const handleWhatsApp = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    title: string
+  ) => {
+    event.preventDefault()
     const MESSAGE = title.replace(' ', '%20')
 
     const url = `https://wa.me/5211234567890?text=Hola!%20Vi%20tu%20pubilacion%20${MESSAGE}`
     window.open(url, '_blank')
   }
 
-  const handleShare = (post: Posts) => {
+  const handleShare = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    post: Posts
+  ) => {
+    event.preventDefault()
     const postData = {
       title: post?.title,
       description: post?.description,
@@ -189,26 +197,37 @@ export default function Home({ postsData, errorCode }: Props) {
           )
 
           return (
-            <Box
+            <Link
               key={post.id}
-              marginBottom={8}
-              bgGradient="linear(to-bl, cyan.600, cyan.800)"
-              _hover={{
-                bgGradient: 'linear(to-l, cyan.800, cyan.800)',
-                color: 'cyan.900',
+              href={{
+                pathname: `/post/${post?.id}`,
+                query: {
+                  title: post?.title,
+                  description: post?.description,
+                  whatsApp: post?.whatsApp,
+                },
               }}
-              borderRadius={8}
-              padding={8}
             >
-              <Box>
-                <Flex alignItems="center">
-                  <Heading
-                    fontWeight={600}
-                    fontSize={{ base: 'l', sm: 'xl', md: '2xl' }}
-                    lineHeight={'150%'}
-                    noOfLines={1}
-                  >
-                    <Link
+              <Box
+                marginBottom={8}
+                bgGradient="linear(to-bl, cyan.600, cyan.800)"
+                _hover={{
+                  bgGradient: 'linear(to-l, cyan.800, cyan.800)',
+                  color: 'cyan.400',
+                }}
+                borderRadius={8}
+                padding={8}
+                cursor="pointer"
+              >
+                <Box>
+                  <Flex alignItems="center">
+                    <Heading
+                      fontWeight={600}
+                      fontSize={{ base: 'l', sm: 'xl', md: '2xl' }}
+                      lineHeight={'150%'}
+                      noOfLines={1}
+                    >
+                      {/* <Link
                       href={{
                         pathname: `/post/${post?.id}`,
                         query: {
@@ -217,40 +236,41 @@ export default function Home({ postsData, errorCode }: Props) {
                           whatsApp: post?.whatsApp,
                         },
                       }}
-                    >
+                    > */}
                       {post.title}
-                    </Link>
-                  </Heading>
-                  {/* <Spacer />
+                      {/* </Link> */}
+                    </Heading>
+                    {/* <Spacer />
                   <Button onClick={() => handleShare(post)}>
                     <FiShare2 size={24} />
                   </Button> */}
-                </Flex>
-                <Text color={'cyan.100'} marginTop={2}>
-                  {post.description}
-                </Text>
-              </Box>
+                  </Flex>
+                  <Text color={'cyan.100'} marginTop={2}>
+                    {post.description}
+                  </Text>
+                </Box>
 
-              <Flex alignItems="center" marginTop={8}>
-                <IconButton
-                  icon={<BsWhatsapp size={24} />}
-                  aria-label="Escribir mensaje vía WhatsApp"
-                  onClick={() => handleWhatsApp(post.title)}
-                  variant="ghost"
-                  size={'sm'}
-                  mr={4}
-                />
-                <IconButton
-                  icon={<FiShare2 size={24} />}
-                  aria-label="Compartir en redes sociales"
-                  onClick={() => handleShare(post)}
-                  variant="ghost"
-                  size={'sm'}
-                />
-                <Spacer />
-                {PUBLISHED_TIME_AGO}
-              </Flex>
-            </Box>
+                <Flex alignItems="center" marginTop={8}>
+                  <IconButton
+                    icon={<BsWhatsapp size={24} />}
+                    aria-label="Escribir mensaje vía WhatsApp"
+                    onClick={(e) => handleWhatsApp(e, post.title)}
+                    variant="ghost"
+                    size={'sm'}
+                    mr={4}
+                  />
+                  <IconButton
+                    icon={<FiShare2 size={24} />}
+                    aria-label="Compartir en redes sociales"
+                    onClick={(e) => handleShare(e, post)}
+                    variant="ghost"
+                    size={'sm'}
+                  />
+                  <Spacer />
+                  {PUBLISHED_TIME_AGO}
+                </Flex>
+              </Box>
+            </Link>
           )
         })}
         <Center>
