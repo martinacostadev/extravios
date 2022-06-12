@@ -8,7 +8,24 @@ const theme = extendTheme({
   },
   colors: {
     bg: {
-      dark: '#12101C',
+      light: '#FFFFFF',
+      dark: '#13111C',
+    },
+    cyanBlue: '#06141d',
+    white: '#f1f9fe',
+    whiteLight: '#E7E7E7',
+    grayVeryLight: '#212121',
+    cyan: {
+      50: '#f1f9fe',
+      100: '#e3f0fb',
+      200: '#c0e3f7',
+      300: '#89cdf0',
+      400: '#49b2e7',
+      500: '#2299d5',
+      600: '#147ab5',
+      700: '#116293',
+      800: '#12547a',
+      900: '#06141d',
     },
   },
   fonts: {
@@ -20,9 +37,9 @@ const theme = extendTheme({
       'html, body': {
         height: '100%',
         maxHeight: '100vh',
-        background: mode(
-          'radial-gradient(circle at 2px 2px, #E7E7E7 2px, #FFFFFF 0)',
-          'radial-gradient(circle at 2px 2px, #212121 2px, #13111C 0)'
+        bgGradient: mode(
+          'radial(circle at 2px 2px, whiteLight 2px, bg.light 0)',
+          'radial(circle at 2px 2px, grayVeryLight 2px, bg.dark 0)'
         )(props),
         backgroundSize: '40px 40px',
         fontSize: '14px',

@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
+import Link from 'next/link'
 
 import {
   Container,
@@ -10,27 +11,87 @@ import {
   Input,
   Button,
   Center,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  useDisclosure,
+  ModalFooter,
 } from '@chakra-ui/react'
 import { Posts } from 'interfaces'
 
 import { BsWhatsapp } from 'react-icons/bs'
-import { BsFilterCircleFill } from 'react-icons/bs'
+import { FiShare2 } from 'react-icons/fi'
 import { server } from 'config'
 
 import debounce from 'just-debounce-it'
+import { getTimeAgo } from 'utils/common'
+
+import Error from 'next/error'
+
+import {
+  WhatsappShareButton,
+  WhatsappIcon,
+  FacebookShareButton,
+  FacebookIcon,
+  TwitterShareButton,
+  TwitterIcon,
+} from 'next-share'
 
 interface Props {
   postsData: Posts[]
+  errorCode: number
 }
 
-export default function SplitWithImage({ postsData }: Props) {
+const HomeSearch = forwardRef<HTMLInputElement, { onChange: VoidFunction }>(
+  ({ onChange }, ref) => {
+    return (
+      <Input
+        placeholder="Buscar por título"
+        _placeholder={{ opacity: 0.8, color: 'cyan.100' }}
+        color="white"
+        fontSize="1.1em"
+        marginY={4}
+        onChange={onChange}
+        ref={ref}
+      />
+    )
+  }
+)
+
+export default function Home({ postsData, errorCode }: Props) {
   const [posts, setPosts] = React.useState(postsData)
   const [page, setPage] = React.useState(2)
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [modalInfo, setModalInfo] = React.useState({
+    title: '',
+    description: '',
+    whatsApp: '',
+    url: '',
+  })
+
+  const OverlayTwo = () => (
+    <ModalOverlay
+      bg="none"
+      backdropFilter="auto"
+      backdropInvert="80%"
+      backdropBlur="2px"
+    />
+  )
+
+  const [overlay, setOverlay] = React.useState(<OverlayTwo />)
   const searchInput = React.useRef<HTMLInputElement>(null)
+
+  if (errorCode) {
+    return <Error statusCode={errorCode} />
+  }
 
   const handleSearch = debounce(() => {
     setPage(2)
-    fetch(`${server}/posts/?title=${searchInput?.current?.value}`)
+    const URL = `${server}/posts/?title=${searchInput?.current?.value}`
+    fetch(URL)
       .then((res) => res.json())
       .then((data) => {
         setPosts(data)
@@ -44,9 +105,62 @@ export default function SplitWithImage({ postsData }: Props) {
     setPosts((prev) => [...prev, ...postsData])
   }
 
+  const handleWhatsApp = (title: string) => {
+    const MESSAGE = title.replace(' ', '%20')
+
+    const url = `https://wa.me/5211234567890?text=Hola!%20Vi%20tu%20pubilacion%20${MESSAGE}`
+    window.open(url, '_blank')
+  }
+
+  const handleShare = (post: Posts) => {
+    const postData = {
+      title: post?.title,
+      description: post?.description,
+      whatsApp: post?.whatsApp,
+      url: `${server}/post/${post?.id}`,
+    }
+    setModalInfo(postData)
+    setOverlay(<OverlayTwo />)
+    onOpen()
+  }
+
   return (
     <Container py={4} centerContent>
-      <Box padding="4" bg="#06141d" color="white" maxW="md" borderRadius={8}>
+      <Modal size="sm" isCentered isOpen={isOpen} onClose={onClose}>
+        {overlay}
+        <ModalContent>
+          <ModalHeader>Compartir</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Flex minWidth="max-content" justifyContent="center" gap={4} p={4}>
+              <FacebookShareButton
+                url={modalInfo?.url}
+                quote={modalInfo?.description}
+                hashtag={'#nextshare'}
+              >
+                <FacebookIcon size={48} round />
+              </FacebookShareButton>
+
+              <WhatsappShareButton
+                url={modalInfo?.url}
+                title={modalInfo?.title}
+                separator=":: "
+              >
+                <WhatsappIcon size={48} round />
+              </WhatsappShareButton>
+
+              <TwitterShareButton url={modalInfo?.url} title={modalInfo?.title}>
+                <TwitterIcon size={48} round />
+              </TwitterShareButton>
+            </Flex>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={onClose}>Cerrar</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Box padding="4" bg="cyan-900" color="white" maxW="md" borderRadius={8}>
         <Flex minWidth="max-content" alignItems="center" marginTop={4}>
           <Heading
             fontWeight={600}
@@ -56,45 +170,66 @@ export default function SplitWithImage({ postsData }: Props) {
           >
             Extravíos
           </Heading>
-          <Spacer />
-          <BsFilterCircleFill size={24} />
         </Flex>
-        {/* TODO: Filter Posts by Title using /api/posts?title=tarjeta */}
-        <Input
-          placeholder="Buscar por titulo"
-          marginY={4}
-          onChange={handleSearch}
-          ref={searchInput}
-        />
-        {/* TODO: Add infinite scroll */}
-        {posts?.map((post) => (
-          <Box
-            key={post.id}
-            marginBottom={8}
-            backgroundColor={'#1b2730'}
-            borderRadius={8}
-            padding={8}
-          >
-            <Box onClick={() => console.log('PostID: ', post?.id)}>
-              <Heading
-                fontWeight={600}
-                fontSize={{ base: 'l', sm: 'xl', md: '2xl' }}
-                lineHeight={'150%'}
-              >
-                {post.title}
-              </Heading>
-              <Text color={'gray.300'} marginTop={2}>
-                {post.description}
-              </Text>
-            </Box>
+        <HomeSearch ref={searchInput} onChange={handleSearch} />
 
-            <Flex minWidth="max-content" alignItems="center" marginTop={4}>
-              <BsWhatsapp size={24} />
-              <Spacer />
-              hace 3 hs
-            </Flex>
-          </Box>
-        ))}
+        {posts?.map((post) => {
+          const PUBLISHED_TIME_AGO = getTimeAgo(
+            Number(new Date(post?.createdAt))
+          )
+
+          return (
+            <Box
+              key={post.id}
+              marginBottom={8}
+              bgGradient="linear(to-bl, cyan.600, cyan.800)"
+              _hover={{
+                bgGradient: 'linear(to-l, cyan.800, cyan.800)',
+                color: 'cyan.900',
+              }}
+              borderRadius={8}
+              padding={8}
+            >
+              <Box>
+                <Flex minWidth="max-content" alignItems="center">
+                  <Heading
+                    fontWeight={600}
+                    fontSize={{ base: 'l', sm: 'xl', md: '2xl' }}
+                    lineHeight={'150%'}
+                  >
+                    <Link
+                      href={{
+                        pathname: `/post/${post?.id}`,
+                        query: {
+                          title: post?.title,
+                          description: post?.description,
+                          whatsApp: post?.whatsApp,
+                        },
+                      }}
+                    >
+                      {post.title}
+                    </Link>
+                  </Heading>
+                  <Spacer />
+                  <Button onClick={() => handleShare(post)}>
+                    <FiShare2 size={24} />
+                  </Button>
+                </Flex>
+                <Text color={'cyan.100'} marginTop={2}>
+                  {post.description}
+                </Text>
+              </Box>
+
+              <Flex minWidth="max-content" alignItems="center" marginTop={4}>
+                <Button onClick={() => handleWhatsApp(post.title)}>
+                  <BsWhatsapp size={24} />
+                </Button>
+                <Spacer />
+                {PUBLISHED_TIME_AGO}
+              </Flex>
+            </Box>
+          )
+        })}
         <Center>
           <Button onClick={loadMore}>Cargar más</Button>
         </Center>
@@ -106,7 +241,8 @@ export default function SplitWithImage({ postsData }: Props) {
 export async function getServerSideProps() {
   const page = 1
   const res = await fetch(`${server}/posts/?page=${page}`)
+  const errorCode = res.ok ? false : res?.status
   const postsData = await res.json()
 
-  return { props: { postsData } }
+  return { props: { postsData, errorCode } }
 }
