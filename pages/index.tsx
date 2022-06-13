@@ -277,22 +277,26 @@ export default function Home({ postsData, errorCode }: Props) {
             </Link>
           )
         })}
-        <Center display="flex" flexDirection={'column'} gap={8}>
+        <Center display="flex" flexDirection={'column'} gap={10}>
           <Button
             onClick={loadMore}
             fontWeight="light"
             backgroundColor={'cyan.800'}
+            _hover={{
+              backgroundColor: 'cyan.600',
+            }}
           >
             Cargar más...
           </Button>
-          <Button
+          <Text
             onClick={handleGoTop}
-            fontSize={12}
+            fontSize={14}
             fontWeight="light"
             variant="ghost"
+            cursor={'pointer'}
           >
             Volver al inicio
-          </Button>
+          </Text>
         </Center>
       </Box>
     </Container>

@@ -38,7 +38,7 @@ const theme = extendTheme({
         height: '100%',
         maxHeight: '100vh',
         bgGradient: mode(
-          'radial(circle at 2px 2px, whiteLight 2px, bg.light 0)',
+          'radial(circle at 2px 2px, grayVeryLight 2px, bg.dark 0)',
           'radial(circle at 2px 2px, grayVeryLight 2px, bg.dark 0)'
         )(props),
         backgroundSize: '40px 40px',
