@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Center,
   Flex,
   Heading,
   IconButton,
@@ -85,7 +86,7 @@ export default function PostItem({ post }: Props) {
   }
 
   return (
-    <>
+    <Center>
       <Modal size="sm" isCentered isOpen={isOpen} onClose={onClose}>
         {overlay}
         <ModalContent>
@@ -141,6 +142,8 @@ export default function PostItem({ post }: Props) {
           borderRadius={8}
           padding={8}
           cursor="pointer"
+          w={'100%'}
+          maxW={400}
         >
           <Box>
             <Flex alignItems="center">
@@ -179,6 +182,6 @@ export default function PostItem({ post }: Props) {
           </Flex>
         </Box>
       </Link>
-    </>
+    </Center>
   )
 }

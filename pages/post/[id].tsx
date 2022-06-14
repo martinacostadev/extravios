@@ -1,22 +1,19 @@
 // import { Posts } from 'interfaces'
 import { GetStaticPropsContext } from 'next'
 
-import { Container } from '@chakra-ui/react'
 import { server } from 'config'
 import { Posts } from 'interfaces'
+import PostItem from 'components/PostItem'
+import { Container } from '@chakra-ui/react'
 
 interface Props {
-  postsData: Posts
+  post: Posts
 }
 
-export default function PostDetail({ postsData }: Props) {
-  const { title, description, whatsApp } = postsData
-
+export default function PostDetail({ post }: Props) {
   return (
-    <Container py={4} centerContent color="white" fontSize={'3xl'}>
-      <h1>{title}</h1>
-      <p>{description}</p>
-      <p>{whatsApp}</p>
+    <Container paddingTop={16}>
+      <PostItem key={post?.id} post={post} />
     </Container>
   )
 }
@@ -25,7 +22,7 @@ export async function getServerSideProps(context: GetStaticPropsContext) {
   const ID = context?.params?.id
 
   const res = await fetch(`${server}/posts/${ID}`)
-  const postsData = await res.json()
+  const post = await res.json()
 
-  return { props: { postsData } }
+  return { props: { post } }
 }
