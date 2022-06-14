@@ -1,29 +1,22 @@
 import React, { forwardRef } from 'react'
-import Link from 'next/link'
-
+import Error from 'next/error'
 import {
   Container,
   Box,
-  Heading,
-  Text,
-  Flex,
   Input,
-  Button,
-  Center,
   InputGroup,
   InputLeftElement,
 } from '@chakra-ui/react'
+import debounce from 'just-debounce-it'
+
+import { server } from 'config'
 import { Posts } from 'interfaces'
 
 import { BiSearch } from 'react-icons/bi'
 
-import { server } from 'config'
-
-import debounce from 'just-debounce-it'
-
-import Error from 'next/error'
-
 import PostItem from 'components/PostItem'
+import HomeHeader from 'components/HomeHeader'
+import HomeFooter from 'components/HomeFooter'
 
 interface Props {
   response: {
@@ -101,51 +94,20 @@ export default function Home({ response, errorCode }: Props) {
         borderRadius={8}
         ref={topRef}
       >
-        <Flex minWidth="max-content" alignItems="center" marginTop={4}>
-          <Heading
-            fontWeight={600}
-            fontSize={{ base: 'xl', sm: '2xl', md: '4xl' }}
-            lineHeight={'150%'}
-            marginBottom={4}
-          >
-            <Link
-              href={{
-                pathname: `/`,
-              }}
-            >
-              Extravíos
-            </Link>
-          </Heading>
-        </Flex>
+        <HomeHeader />
+
         <HomeSearch ref={searchInput} onChange={handleSearch} />
 
         {posts?.map((post) => (
           <PostItem key={post?.id} post={post} />
         ))}
 
-        <Center display="flex" flexDirection={'column'} gap={10}>
-          {SHOW_MORE_BUTTON && !IS_SEARCHING && (
-            <Button
-              onClick={loadMore}
-              fontWeight="light"
-              backgroundColor={'cyan.800'}
-              _hover={{
-                backgroundColor: 'cyan.600',
-              }}
-            >
-              Cargar más...
-            </Button>
-          )}
-          <Text
-            onClick={handleGoTop}
-            fontSize={14}
-            fontWeight="light"
-            variant="ghost"
-            cursor={'pointer'}
-          >
-            Volver al inicio
-          </Text>
-        </Center>
+        <HomeFooter
+          loadMore={loadMore}
+          showMoreButton={SHOW_MORE_BUTTON}
+          isSearching={IS_SEARCHING}
+          handleGoTop={handleGoTop}
+        />
       </Box>
     </Container>
   )
