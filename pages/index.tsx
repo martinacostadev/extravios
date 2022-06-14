@@ -46,7 +46,10 @@ import {
 } from 'next-share'
 
 interface Props {
-  postsData: Posts[]
+  response: {
+    rows: Posts[]
+    count: number
+  }
   errorCode: number
 }
 
@@ -71,11 +74,16 @@ const HomeSearch = forwardRef<HTMLInputElement, { onChange: VoidFunction }>(
   }
 )
 
-export default function Home({ postsData, errorCode }: Props) {
-  const [posts, setPosts] = React.useState(postsData)
+export default function Home({ response, errorCode }: Props) {
+  const { count, rows } = response
+
+  const [posts, setPosts] = React.useState(rows)
   const [page, setPage] = React.useState(2)
   const topRef = React.useRef<HTMLInputElement>(null)
   const searchInput = React.useRef<HTMLInputElement>(null)
+
+  const SHOW_MORE_BUTTON = count > posts?.length
+  const IS_SEARCHING = Boolean(searchInput.current?.value?.length)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [modalInfo, setModalInfo] = React.useState({
@@ -106,7 +114,7 @@ export default function Home({ postsData, errorCode }: Props) {
     fetch(URL)
       .then((res) => res.json())
       .then((data) => {
-        setPosts(data)
+        setPosts(data.rows)
       })
   }, 500)
 
@@ -117,7 +125,8 @@ export default function Home({ postsData, errorCode }: Props) {
   const loadMore = async () => {
     setPage(page + 1)
     const res = await fetch(`${server}/posts?page=${page}`)
-    const postsData = await res.json()
+    const response = await res.json()
+    const postsData = response.rows
     setPosts((prev) => [...prev, ...postsData])
   }
 
@@ -278,16 +287,18 @@ export default function Home({ postsData, errorCode }: Props) {
           )
         })}
         <Center display="flex" flexDirection={'column'} gap={10}>
-          <Button
-            onClick={loadMore}
-            fontWeight="light"
-            backgroundColor={'cyan.800'}
-            _hover={{
-              backgroundColor: 'cyan.600',
-            }}
-          >
-            Cargar más...
-          </Button>
+          {SHOW_MORE_BUTTON && !IS_SEARCHING && (
+            <Button
+              onClick={loadMore}
+              fontWeight="light"
+              backgroundColor={'cyan.800'}
+              _hover={{
+                backgroundColor: 'cyan.600',
+              }}
+            >
+              Cargar más...
+            </Button>
+          )}
           <Text
             onClick={handleGoTop}
             fontSize={14}
@@ -307,7 +318,9 @@ export async function getServerSideProps() {
   const page = 1
   const res = await fetch(`${server}/posts/?page=${page}`)
   const errorCode = res.ok ? false : res?.status
-  const postsData = await res.json()
+  const response = await res.json()
 
-  return { props: { postsData, errorCode } }
+  console.log('response: ', response)
+
+  return { props: { response, errorCode } }
 }
