@@ -1,22 +1,15 @@
-import React, { forwardRef } from 'react'
+import React from 'react'
 import Error from 'next/error'
-import {
-  Container,
-  Box,
-  Input,
-  InputGroup,
-  InputLeftElement,
-} from '@chakra-ui/react'
+import { Container, Box } from '@chakra-ui/react'
 import debounce from 'just-debounce-it'
 
 import { server } from 'config'
 import { Posts } from 'interfaces'
 
-import { BiSearch } from 'react-icons/bi'
-
 import PostItem from 'components/PostItem'
 import HomeHeader from 'components/HomeHeader'
 import HomeFooter from 'components/HomeFooter'
+import { InputSearch } from 'components/InputSearch'
 
 interface Props {
   response: {
@@ -25,27 +18,6 @@ interface Props {
   }
   errorCode: number
 }
-
-const HomeSearch = forwardRef<HTMLInputElement, { onChange: VoidFunction }>(
-  ({ onChange }, ref) => {
-    return (
-      <InputGroup>
-        <InputLeftElement pointerEvents="none" mt={4} ml={1} pr={1}>
-          <BiSearch size={22} opacity={0.8} />
-        </InputLeftElement>
-        <Input
-          placeholder="Buscar por título..."
-          _placeholder={{ opacity: 0.8, color: 'cyan.100' }}
-          color="white"
-          fontSize="1.1em"
-          marginY={4}
-          onChange={onChange}
-          ref={ref}
-        />
-      </InputGroup>
-    )
-  }
-)
 
 export default function Home({ response, errorCode }: Props) {
   const { count, rows } = response
@@ -96,7 +68,7 @@ export default function Home({ response, errorCode }: Props) {
       >
         <HomeHeader />
 
-        <HomeSearch ref={searchInput} onChange={handleSearch} />
+        <InputSearch ref={searchInput} onChange={handleSearch} />
 
         {posts?.map((post) => (
           <PostItem key={post?.id} post={post} />
