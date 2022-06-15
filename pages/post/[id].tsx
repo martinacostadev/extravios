@@ -4,7 +4,7 @@ import { GetStaticPropsContext } from 'next'
 import { server } from 'config'
 import { Posts } from 'interfaces'
 import PostItem from 'components/PostItem'
-import { Container } from '@chakra-ui/react'
+import { Container, Center, Link } from '@chakra-ui/react'
 
 interface Props {
   post: Posts
@@ -12,8 +12,13 @@ interface Props {
 
 export default function PostDetail({ post }: Props) {
   return (
-    <Container paddingTop={16}>
+    <Container py={16}>
       <PostItem key={post?.id} post={post} />
+      <Center>
+        <Link href="/">
+          <a>Volver</a>
+        </Link>
+      </Center>
     </Container>
   )
 }
