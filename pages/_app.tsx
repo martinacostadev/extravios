@@ -1,12 +1,14 @@
-import { AppProps } from 'next/app'
-import { ChakraProvider } from '@chakra-ui/react'
 import { UserProvider } from '@auth0/nextjs-auth0'
+import { ChakraProvider } from '@chakra-ui/react'
+import { AppProps } from 'next/app'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
 import theme from 'theme'
 
-import 'styles/globals.css'
-import React from 'react'
 import Layout from 'components/Layout'
+import 'styles/globals.css'
+
+const queryClient = new QueryClient()
 
 function App({ Component, pageProps }: AppProps) {
   return (
@@ -14,7 +16,9 @@ function App({ Component, pageProps }: AppProps) {
       <UserProvider>
         <ChakraProvider theme={theme}>
           <Layout>
-            <Component {...pageProps} />
+            <QueryClientProvider client={queryClient}>
+              <Component {...pageProps} />
+            </QueryClientProvider>
           </Layout>
         </ChakraProvider>
       </UserProvider>

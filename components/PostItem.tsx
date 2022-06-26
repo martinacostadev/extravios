@@ -17,14 +17,14 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 import { server } from 'config'
-import { Posts } from 'interfaces'
+import { Post } from 'interfaces'
 import {
-  FacebookShareButton,
   FacebookIcon,
-  WhatsappShareButton,
-  WhatsappIcon,
-  TwitterShareButton,
+  FacebookShareButton,
   TwitterIcon,
+  TwitterShareButton,
+  WhatsappIcon,
+  WhatsappShareButton,
 } from 'next-share'
 import Link from 'next/link'
 import React from 'react'
@@ -33,7 +33,7 @@ import { FiShare2 } from 'react-icons/fi'
 import { getTimeAgo } from 'utils/common'
 
 interface Props {
-  post: Posts
+  post: Post
 }
 
 export default function PostItem({ post }: Props) {
@@ -71,7 +71,7 @@ export default function PostItem({ post }: Props) {
 
   const handleShare = (
     event: React.MouseEvent<HTMLButtonElement>,
-    post: Posts
+    post: Post
   ) => {
     event.preventDefault()
     const postData = {

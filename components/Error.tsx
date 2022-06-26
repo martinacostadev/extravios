@@ -1,20 +1,19 @@
 import { Box, Container, Heading, Link, Text } from '@chakra-ui/react'
 
 interface Props {
-  statusCode: number
+  message: string
 }
 
-export default function Error({ statusCode }: Props) {
+export default function Error({ message }: Props) {
   return (
-    <Container>
+    <Container p={24}>
       <Box>
         <Heading>Error</Heading>
-        <Text>
-          Error: {statusCode}
-          <Link href="/">
-            <a>Volver a la página principal</a>
-          </Link>
-        </Text>
+        <Text py={8}>Error: {message}</Text>
+
+        <Link href="/">
+          <a>Volver a la página principal</a>
+        </Link>
       </Box>
     </Container>
   )

@@ -1,13 +1,13 @@
 // import { Posts } from 'interfaces'
 import { GetStaticPropsContext } from 'next'
 
-import { server } from 'config'
-import { Posts } from 'interfaces'
+import { Center, Container, Link } from '@chakra-ui/react'
 import PostItem from 'components/PostItem'
-import { Container, Center, Link } from '@chakra-ui/react'
+import { server } from 'config'
+import { Post } from 'interfaces'
 
 interface Props {
-  post: Posts
+  post: Post
 }
 
 export default function PostDetail({ post }: Props) {

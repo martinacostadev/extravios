@@ -1,38 +1,47 @@
-import React from 'react'
-import Error from 'next/error'
-import { Container, Box } from '@chakra-ui/react'
+import { Box, Container } from '@chakra-ui/react'
 import debounce from 'just-debounce-it'
+import React, { useEffect } from 'react'
 
 import { server } from 'config'
-import { Posts } from 'interfaces'
 
-import PostItem from 'components/PostItem'
-import HomeHeader from 'components/HomeHeader'
+import Error from 'components/Error'
 import HomeFooter from 'components/HomeFooter'
+import HomeHeader from 'components/HomeHeader'
 import { InputSearch } from 'components/InputSearch'
+import Loading from 'components/Loading'
+import PostItem from 'components/PostItem'
+import { Post } from 'interfaces'
+import { useQuery } from 'react-query'
 
-interface Props {
-  response: {
-    rows: Posts[]
-    count: number
-  }
-  errorCode: number
+interface ApiResponse {
+  count: number
+  rows: Post[]
 }
 
-export default function Home({ response, errorCode }: Props) {
-  const { count, rows } = response
-
-  const [posts, setPosts] = React.useState(rows)
+export default function Home() {
+  const [posts, setPosts] = React.useState<ApiResponse['rows']>([])
   const [page, setPage] = React.useState(2)
   const topRef = React.useRef<HTMLInputElement>(null)
   const searchInput = React.useRef<HTMLInputElement>(null)
 
-  const SHOW_MORE_BUTTON = count > posts?.length
-  const IS_SEARCHING = Boolean(searchInput.current?.value?.length)
+  const { isLoading, error, data } = useQuery<ApiResponse, Error>('posts', () =>
+    fetch(`${server}/posts/?page=${page}`).then((res) => res.json())
+  )
 
-  if (errorCode) {
-    return <Error statusCode={errorCode} />
+  useEffect(() => {
+    if (data) {
+      setPosts(data?.rows)
+    }
+  }, [data])
+
+  if (isLoading) return <Loading />
+
+  if (error) {
+    return <Error message={'An error has occurred: ' + error.message} />
   }
+
+  const SHOW_MORE_BUTTON = data ? data?.count > data?.rows?.length : false
+  const IS_SEARCHING = Boolean(searchInput.current?.value?.length)
 
   const handleSearch = debounce(() => {
     setPage(2)
@@ -70,9 +79,8 @@ export default function Home({ response, errorCode }: Props) {
 
         <InputSearch ref={searchInput} onChange={handleSearch} />
 
-        {posts?.map((post) => (
-          <PostItem key={post?.id} post={post} />
-        ))}
+        {posts &&
+          posts.map((post: Post) => <PostItem key={post?.id} post={post} />)}
 
         <HomeFooter
           loadMore={loadMore}
@@ -83,13 +91,4 @@ export default function Home({ response, errorCode }: Props) {
       </Box>
     </Container>
   )
-}
-
-export async function getServerSideProps() {
-  const page = 1
-  const res = await fetch(`${server}/posts/?page=${page}`)
-  const errorCode = res.ok ? false : res?.status
-  const response = await res.json()
-
-  return { props: { response, errorCode } }
 }
