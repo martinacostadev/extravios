@@ -1,14 +1,18 @@
 import { Box, Button, Flex, Input, Stack, useToast } from '@chakra-ui/react'
 import axios from 'axios'
 import { AutoResizeTextarea } from 'components/AutoResizeTextarea'
+import Cities from 'components/Cities'
+import Provinces from 'components/Provinces'
 import { server } from 'config'
 import { useFormik } from 'formik'
+import { Province } from 'interfaces'
 import { useState } from 'react'
 import * as Yup from 'yup'
 
 export default function New() {
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
+  const [provinceId, setProvinceId] = useState<Province['id']>('')
   const toast = useToast()
 
   const formik = useFormik({
@@ -27,6 +31,7 @@ export default function New() {
         .min(20, 'Al menos 20 caracteres')
         .max(250, 'Máximo 250 caracteres')
         .required('Requerido'),
+      province: Yup.string().required('Requerido'),
       city: Yup.string()
         .min(6, 'Al menos 6 caracteres')
         .max(100, 'Máximo 100 caracteres')
@@ -64,6 +69,12 @@ export default function New() {
         })
     },
   })
+
+  const handleProvince = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log(e.target)
+    setProvinceId(e.target.value)
+    formik.setFieldValue('city', '')
+  }
 
   return (
     <Flex
@@ -104,14 +115,19 @@ export default function New() {
           {formik.touched.description && formik.errors.description ? (
             <Box color={'red.600'}>{formik.errors.description}</Box>
           ) : null}
-          <Input
+
+          <Provinces onChange={handleProvince} />
+
+          <Cities provinceId={provinceId} />
+
+          {/* <Input
             placeholder="Ciudad"
             size="md"
             id="city"
             name="city"
             onChange={formik.handleChange}
             value={formik.values.city}
-          />
+          /> */}
           {formik.touched.city && formik.errors.city ? (
             <Box color={'red.600'}>{formik.errors.city}</Box>
           ) : null}
