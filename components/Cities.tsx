@@ -1,9 +1,15 @@
 import { Select } from '@chakra-ui/react'
 import useCities from 'hooks/useCities'
 import { City, CityProvince, Province } from 'interfaces/index'
-import { useEffect, useState } from 'react'
+import { ChangeEventHandler, useEffect, useState } from 'react'
 
-export default function Cities({ provinceId }: { provinceId: Province['id'] }) {
+export default function Cities({
+  provinceId,
+  onChange,
+}: {
+  provinceId: Province['id']
+  onChange: ChangeEventHandler<HTMLSelectElement>
+}) {
   const cities = useCities()
   const [data, setData] = useState<CityProvince['ciudades']>([])
 
@@ -17,7 +23,7 @@ export default function Cities({ provinceId }: { provinceId: Province['id'] }) {
   }, [cities, provinceId])
 
   return (
-    <Select placeholder="Seleccione Ciudad">
+    <Select placeholder="Seleccione Ciudad" onChange={onChange}>
       {data?.map((city: City) => (
         <option key={city.id} value={city.id}>
           {city.nombre}

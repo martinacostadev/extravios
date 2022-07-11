@@ -1,3 +1,4 @@
+import { useUser } from '@auth0/nextjs-auth0'
 import { Box, Button, Flex, Input, Stack, useToast } from '@chakra-ui/react'
 import axios from 'axios'
 import { AutoResizeTextarea } from 'components/AutoResizeTextarea'
@@ -13,12 +14,14 @@ export default function New() {
   const [error, setError] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
   const [provinceId, setProvinceId] = useState<Province['id']>('')
+  const { user, error: userError, isLoading: userLoading } = useUser()
   const toast = useToast()
 
   const formik = useFormik({
     initialValues: {
       title: '',
       description: '',
+      province: '',
       city: '',
       whatsApp: '',
     },
@@ -32,10 +35,7 @@ export default function New() {
         .max(250, 'Máximo 250 caracteres')
         .required('Requerido'),
       province: Yup.string().required('Requerido'),
-      city: Yup.string()
-        .min(6, 'Al menos 6 caracteres')
-        .max(100, 'Máximo 100 caracteres')
-        .required('Requerido'),
+      city: Yup.string().required('Requerido'),
       whatsApp: Yup.string()
         .min(6, 'Al menos 6 caracteres')
         .max(20, 'Máximo 20 caracteres')
@@ -45,9 +45,18 @@ export default function New() {
       setLoading(true)
       setError('')
 
+      const userId = user ? user.sub?.split('|')[1] : undefined
+
+      console.log('values :', values)
+      const formValues = {
+        ...values,
+        userId,
+      }
+      console.log('formValues :', formValues)
+
       const URL = `${server}/posts`
       axios
-        .post(URL, values)
+        .post(URL, formValues)
         .then(function () {
           resetForm()
           toast({
@@ -69,9 +78,21 @@ export default function New() {
   })
 
   const handleProvince = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setProvinceId(e.target.value)
+    const provinceId = e.target.value
+    const provinceName = e.target.options[e.target.selectedIndex].text
+    setProvinceId(provinceId)
+    formik.setFieldValue('province', provinceName)
     formik.setFieldValue('city', '')
   }
+
+  const handleCity = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const cityName = e.target.options[e.target.selectedIndex].text
+    console.log('cityName : ', cityName)
+    formik.setFieldValue('city', cityName)
+  }
+
+  if (userLoading) return <div>Loading...</div>
+  if (userError) return <div>{userError.message}</div>
 
   return (
     <Flex
@@ -115,7 +136,11 @@ export default function New() {
 
           <Provinces onChange={handleProvince} />
 
-          <Cities provinceId={provinceId} />
+          {formik.touched.province && formik.errors.province ? (
+            <Box color={'red.600'}>{formik.errors.province}</Box>
+          ) : null}
+
+          <Cities provinceId={provinceId} onChange={handleCity} />
 
           {/* <Input
             placeholder="Ciudad"
