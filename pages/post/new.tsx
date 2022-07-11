@@ -48,8 +48,7 @@ export default function New() {
       const URL = `${server}/posts`
       axios
         .post(URL, values)
-        .then(function (response) {
-          console.log(response)
+        .then(function () {
           resetForm()
           toast({
             position: 'top',
@@ -61,7 +60,6 @@ export default function New() {
           })
         })
         .catch(function (error) {
-          console.log(error)
           setError(error?.message)
         })
         .finally(() => {
@@ -71,7 +69,6 @@ export default function New() {
   })
 
   const handleProvince = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log(e.target)
     setProvinceId(e.target.value)
     formik.setFieldValue('city', '')
   }
