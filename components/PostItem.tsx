@@ -1,3 +1,4 @@
+import { useUser } from '@auth0/nextjs-auth0'
 import {
   Box,
   Button,
@@ -41,8 +42,6 @@ interface Props {
 
 export default function PostItem({ post }: Props) {
   const toast = useToast()
-  const PUBLISHED_TIME_AGO = getTimeAgo(Number(new Date(post?.createdAt)))
-
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [modalInfo, setModalInfo] = React.useState({
     title: '',
@@ -61,6 +60,13 @@ export default function PostItem({ post }: Props) {
   )
 
   const [overlay, setOverlay] = React.useState(<OverlayTwo />)
+
+  const { user, error, isLoading } = useUser()
+
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>{error.message}</div>
+
+  const PUBLISHED_TIME_AGO = getTimeAgo(Number(new Date(post?.createdAt)))
 
   const handleWhatsApp = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -91,6 +97,9 @@ export default function PostItem({ post }: Props) {
 
   const handleLike = (event: React.MouseEvent<HTMLDivElement>, post: Post) => {
     event.preventDefault()
+
+    if (!user) return
+
     const POST_ID = post?.id
     const URL = `${server}/posts/like/${POST_ID}`
 
@@ -212,6 +221,7 @@ export default function PostItem({ post }: Props) {
               size={'sm'}
               mr={4}
             />
+
             <Box onClick={(e) => handleLike(e, post)} display="flex">
               <IconButton
                 icon={<BiLike size={28} />}
@@ -224,6 +234,7 @@ export default function PostItem({ post }: Props) {
                 {post?.likes}
               </Box>
             </Box>
+
             <Spacer />
             {PUBLISHED_TIME_AGO}
           </Flex>
