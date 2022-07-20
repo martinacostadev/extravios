@@ -15,7 +15,9 @@ import {
   Spacer,
   Text,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react'
+import axios from 'axios'
 import { server } from 'config'
 import { Post } from 'interfaces'
 import {
@@ -28,6 +30,7 @@ import {
 } from 'next-share'
 import Link from 'next/link'
 import React from 'react'
+import { BiLike } from 'react-icons/bi'
 import { BsWhatsapp } from 'react-icons/bs'
 import { FiShare2 } from 'react-icons/fi'
 import { getTimeAgo } from 'utils/common'
@@ -37,6 +40,7 @@ interface Props {
 }
 
 export default function PostItem({ post }: Props) {
+  const toast = useToast()
   const PUBLISHED_TIME_AGO = getTimeAgo(Number(new Date(post?.createdAt)))
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -83,6 +87,36 @@ export default function PostItem({ post }: Props) {
     setModalInfo(postData)
     setOverlay(<OverlayTwo />)
     onOpen()
+  }
+
+  const handleLike = (event: React.MouseEvent<HTMLDivElement>, post: Post) => {
+    event.preventDefault()
+    console.log('post', post)
+    const POST_ID = post?.id
+    const URL = `${server}/posts/like/${POST_ID}`
+
+    axios
+      .put(URL)
+      .then(function () {
+        toast({
+          position: 'top',
+          title: '¡Me gusta!',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        })
+      })
+      .catch(function (error) {
+        const errorMessage = `¡Ups! Ocurrió un error: ${error}`
+
+        toast({
+          position: 'top',
+          title: errorMessage,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+      })
   }
 
   return (
@@ -170,13 +204,27 @@ export default function PostItem({ post }: Props) {
               size={'sm'}
               mr={4}
             />
+
             <IconButton
               icon={<FiShare2 size={24} />}
               aria-label="Compartir en redes sociales"
               onClick={(e) => handleShare(e, post)}
               variant="ghost"
               size={'sm'}
+              mr={4}
             />
+            <Box onClick={(e) => handleLike(e, post)} display="flex">
+              <IconButton
+                icon={<BiLike size={28} />}
+                aria-label="Me gusta"
+                variant="ghost"
+                size={'sm'}
+                mr={2}
+              />
+              <Box fontSize={16} fontWeight={'bold'}>
+                {post?.likes}
+              </Box>
+            </Box>
             <Spacer />
             {PUBLISHED_TIME_AGO}
           </Flex>

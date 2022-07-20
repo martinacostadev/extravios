@@ -5,6 +5,8 @@ export interface Post {
   whatsApp: string
   createdAt: string
   updatedAt: string
+  userId: string
+  likes: number
 }
 
 export interface Province {
