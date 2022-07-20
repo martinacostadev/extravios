@@ -47,12 +47,10 @@ export default function New() {
 
       const userId = user ? user.sub?.split('|')[1] : undefined
 
-      console.log('values :', values)
       const formValues = {
         ...values,
         userId,
       }
-      console.log('formValues :', formValues)
 
       const URL = `${server}/posts`
       axios
@@ -87,7 +85,6 @@ export default function New() {
 
   const handleCity = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const cityName = e.target.options[e.target.selectedIndex].text
-    console.log('cityName : ', cityName)
     formik.setFieldValue('city', cityName)
   }
 

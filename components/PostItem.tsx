@@ -91,7 +91,6 @@ export default function PostItem({ post }: Props) {
 
   const handleLike = (event: React.MouseEvent<HTMLDivElement>, post: Post) => {
     event.preventDefault()
-    console.log('post', post)
     const POST_ID = post?.id
     const URL = `${server}/posts/like/${POST_ID}`
 
