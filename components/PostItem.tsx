@@ -98,7 +98,17 @@ export default function PostItem({ post }: Props) {
   const handleLike = (event: React.MouseEvent<HTMLDivElement>, post: Post) => {
     event.preventDefault()
 
-    if (!user) return
+    if (!user) {
+      toast({
+        position: 'top',
+        title: 'Debes estar logueado',
+        status: 'error',
+        duration: 700,
+        isClosable: true,
+      })
+
+      return
+    }
 
     const POST_ID = post?.id
     const URL = `${server}/posts/like/${POST_ID}`
