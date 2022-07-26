@@ -110,8 +110,9 @@ export default function PostItem({ post }: Props) {
       return
     }
 
+    const USER_ID = user.sub?.split('|')[1]
     const POST_ID = post?.id
-    const URL = `${server}/posts/like/${POST_ID}`
+    const URL = `${server}/posts/like/${USER_ID}&${POST_ID}`
 
     axios
       .put(URL)
