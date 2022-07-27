@@ -34,6 +34,7 @@ import React from 'react'
 import { BiLike } from 'react-icons/bi'
 import { BsWhatsapp } from 'react-icons/bs'
 import { FiShare2 } from 'react-icons/fi'
+import { useQueryClient } from 'react-query'
 import { getTimeAgo } from 'utils/common'
 
 interface Props {
@@ -42,6 +43,7 @@ interface Props {
 
 export default function PostItem({ post }: Props) {
   const toast = useToast()
+  const queryClient = useQueryClient()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [modalInfo, setModalInfo] = React.useState({
     title: '',
@@ -117,6 +119,7 @@ export default function PostItem({ post }: Props) {
     axios
       .put(URL)
       .then(function () {
+        queryClient.invalidateQueries('posts')
         toast({
           position: 'top',
           title: '¡Me gusta!',
