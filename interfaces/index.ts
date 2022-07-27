@@ -7,6 +7,7 @@ export interface Post {
   updatedAt: string
   userId: string
   likes: string
+  userLiked: boolean
 }
 
 export interface Province {

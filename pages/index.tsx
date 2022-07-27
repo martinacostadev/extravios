@@ -1,3 +1,4 @@
+import { useUser } from '@auth0/nextjs-auth0'
 import { Box, Container } from '@chakra-ui/react'
 import debounce from 'just-debounce-it'
 import React, { useEffect } from 'react'
@@ -24,8 +25,19 @@ export default function Home() {
   const topRef = React.useRef<HTMLInputElement>(null)
   const searchInput = React.useRef<HTMLInputElement>(null)
 
-  const { isLoading, error, data } = useQuery<ApiResponse, Error>('posts', () =>
-    fetch(`${server}/posts/?page=${page}`).then((res) => res.json())
+  const { user, error: errorUser, isLoading: isLoadingUser } = useUser()
+
+  const userId = user ? user.sub?.split('|')[1] : null
+
+  const { isLoading, error, data } = useQuery<ApiResponse, Error>(
+    'posts',
+    () =>
+      fetch(`${server}/posts/?page=${page}&userId=${userId}`).then((res) =>
+        res.json()
+      ),
+    {
+      enabled: userId != null,
+    }
   )
 
   useEffect(() => {
@@ -34,7 +46,9 @@ export default function Home() {
     }
   }, [data])
 
-  if (isLoading) return <Loading />
+  if (isLoadingUser || isLoading) return <Loading />
+
+  if (errorUser) return <div>{errorUser.message}</div>
 
   if (error) {
     return <Error message={'An error has occurred: ' + error.message} />

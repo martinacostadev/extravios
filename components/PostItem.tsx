@@ -31,7 +31,7 @@ import {
 } from 'next-share'
 import Link from 'next/link'
 import React from 'react'
-import { BiLike } from 'react-icons/bi'
+import { BiDislike, BiLike } from 'react-icons/bi'
 import { BsWhatsapp } from 'react-icons/bs'
 import { FiShare2 } from 'react-icons/fi'
 import { useQueryClient } from 'react-query'
@@ -120,13 +120,13 @@ export default function PostItem({ post }: Props) {
       .put(URL)
       .then(function () {
         queryClient.invalidateQueries('posts')
-        toast({
-          position: 'top',
-          title: '¡Me gusta!',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        })
+        // toast({
+        //   position: 'top',
+        //   title: '¡Me gusta!',
+        //   status: 'success',
+        //   duration: 5000,
+        //   isClosable: true,
+        // })
       })
       .catch(function (error) {
         const errorMessage = `¡Ups! Ocurrió un error: ${error}`
@@ -236,18 +236,28 @@ export default function PostItem({ post }: Props) {
               mr={4}
             />
 
-            <Box onClick={(e) => handleLike(e, post)} display="flex">
-              <IconButton
-                icon={<BiLike size={28} />}
-                aria-label="Me gusta"
-                variant="ghost"
-                size={'sm'}
-                mr={2}
-              />
+            <Flex onClick={(e) => handleLike(e, post)}>
+              {post?.userLiked ? (
+                <IconButton
+                  icon={<BiDislike size={28} />}
+                  aria-label="Quitar me gusta"
+                  variant="ghost"
+                  size={'sm'}
+                  mr={2}
+                />
+              ) : (
+                <IconButton
+                  icon={<BiLike size={28} />}
+                  aria-label="Me gusta"
+                  variant="ghost"
+                  size={'sm'}
+                  mr={2}
+                />
+              )}
               <Box fontSize={16} fontWeight={'bold'}>
                 {post?.likes}
               </Box>
-            </Box>
+            </Flex>
 
             <Spacer />
             {PUBLISHED_TIME_AGO}
