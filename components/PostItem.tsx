@@ -34,6 +34,7 @@ import React from 'react'
 import { BiDislike, BiLike } from 'react-icons/bi'
 import { BsWhatsapp } from 'react-icons/bs'
 import { FiShare2 } from 'react-icons/fi'
+import { RiErrorWarningLine } from 'react-icons/ri'
 import { useQueryClient } from 'react-query'
 import { getTimeAgo } from 'utils/common'
 
@@ -69,6 +70,60 @@ export default function PostItem({ post }: Props) {
   if (error) return <div>{error.message}</div>
 
   const PUBLISHED_TIME_AGO = getTimeAgo(Number(new Date(post?.createdAt)))
+
+  const handleReport = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    post: Post
+  ) => {
+    event.preventDefault()
+    const USER_ID = user?.sub?.split('|')[1]
+    const POST_ID = post?.id
+    const URL = `${server}/posts/report`
+
+    const BODY = {
+      userId: USER_ID,
+      postId: POST_ID,
+    }
+
+    if (!user) {
+      toast({
+        position: 'top',
+        title: 'Debes estar logueado',
+        status: 'error',
+        duration: 700,
+        isClosable: true,
+      })
+
+      return
+    }
+
+    axios
+      .post(URL, BODY)
+      .then(function () {
+        queryClient.invalidateQueries('posts')
+        toast({
+          position: 'top',
+          title: 'Publicación reportada con éxito. Gracias!',
+          status: 'info',
+          duration: 700,
+          isClosable: true,
+        })
+      })
+      .catch(function (error) {
+        const errorMessage = error?.response?.data?.message
+          ? error.response.data.message
+          : error
+        const title = `¡Ups! Ocurrió un error: ${errorMessage}`
+
+        toast({
+          position: 'top',
+          title: title,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+      })
+  }
 
   const handleWhatsApp = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -112,7 +167,7 @@ export default function PostItem({ post }: Props) {
       return
     }
 
-    const USER_ID = user.sub?.split('|')[1]
+    const USER_ID = user?.sub?.split('|')[1]
     const POST_ID = post?.id
     const URL = `${server}/posts/like/${USER_ID}&${POST_ID}`
 
@@ -120,20 +175,16 @@ export default function PostItem({ post }: Props) {
       .put(URL)
       .then(function () {
         queryClient.invalidateQueries('posts')
-        // toast({
-        //   position: 'top',
-        //   title: '¡Me gusta!',
-        //   status: 'success',
-        //   duration: 5000,
-        //   isClosable: true,
-        // })
       })
       .catch(function (error) {
-        const errorMessage = `¡Ups! Ocurrió un error: ${error}`
+        const errorMessage = error?.response?.data?.message
+          ? error.response.data.message
+          : error
+        const title = `¡Ups! Ocurrió un error: ${errorMessage}`
 
         toast({
           position: 'top',
-          title: errorMessage,
+          title: title,
           status: 'error',
           duration: 5000,
           isClosable: true,
@@ -200,7 +251,19 @@ export default function PostItem({ post }: Props) {
           cursor="pointer"
           w={'100%'}
           maxW={400}
+          position={'relative'}
         >
+          <Flex position={'absolute'} top={2} right={0}>
+            <IconButton
+              icon={<RiErrorWarningLine size={24} />}
+              aria-label="Reportar la publicación"
+              onClick={(e) => handleReport(e, post)}
+              variant="ghost"
+              size={'sm'}
+              mr={2}
+            />
+          </Flex>
+
           <Box>
             <Flex alignItems="center">
               <Heading
