@@ -21,7 +21,7 @@ interface ApiResponse {
 
 export default function Home() {
   const [posts, setPosts] = React.useState<ApiResponse['rows']>([])
-  const [page, setPage] = React.useState(2)
+  const [page, setPage] = React.useState(1)
   const topRef = React.useRef<HTMLInputElement>(null)
   const searchInput = React.useRef<HTMLInputElement>(null)
 
@@ -53,7 +53,7 @@ export default function Home() {
   const IS_SEARCHING = Boolean(searchInput.current?.value?.length)
 
   const handleSearch = debounce(() => {
-    setPage(2)
+    setPage(1)
     const URL = `${server}/posts/?title=${searchInput?.current?.value}`
     fetch(URL)
       .then((res) => res.json())
@@ -67,8 +67,9 @@ export default function Home() {
   }
 
   const loadMore = async () => {
-    setPage(page + 1)
-    const res = await fetch(`${server}/posts?page=${page}`)
+    const NEXT_PAGE = page + 1
+    const res = await fetch(`${server}/posts?page=${NEXT_PAGE}`)
+    setPage((prev) => prev + 1)
     const response = await res.json()
     const postsData = response.rows
     setPosts((prev) => [...prev, ...postsData])
