@@ -29,15 +29,10 @@ export default function Home() {
 
   const userId = user ? user.sub?.split('|')[1] : null
 
-  const { isLoading, error, data } = useQuery<ApiResponse, Error>(
-    'posts',
-    () =>
-      fetch(`${server}/posts/?page=${page}&userId=${userId}`).then((res) =>
-        res.json()
-      ),
-    {
-      enabled: userId != null,
-    }
+  const { isLoading, error, data } = useQuery<ApiResponse, Error>('posts', () =>
+    fetch(`${server}/posts/?page=${page}&userId=${userId}`).then((res) =>
+      res.json()
+    )
   )
 
   useEffect(() => {
